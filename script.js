@@ -50,7 +50,6 @@ var openProfiles = [];
 // Filter profiles on scroll
 //--------------------------------------------
 var onNewResults = displayAllProfiles;
-waitForKeyElements("#search-results-container", onNewResults);
 waitForKeyElements(
   '[data-anonymize="person-name"]',
   generateHideButtons,
@@ -143,7 +142,6 @@ function toggleDisplay(mode) {
 //--------------------------------------------
 // Generate individual hide buttons
 //--------------------------------------------
-waitForKeyElements("#search-results-container", generateHideButtons);
 function generateHideButtons() {
   const persons = getAllPersons();
   console.log(persons);
