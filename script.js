@@ -51,14 +51,23 @@ var openProfiles = [];
 //--------------------------------------------
 var onNewResults = displayAllProfiles;
 waitForKeyElements("#search-results-container", onNewResults);
+waitForKeyElements(
+  '[data-anonymize="person-name"]',
+  generateHideButtons,
+  false
+);
+waitForKeyElements('[data-anonymize="person-name"]', onNewResults, false);
 
+function getPersonContainer(person) {
+  return person.closest(".artdeco-list__item");
+}
 function hidePerson(person) {
-  const container = person.closest(".artdeco-list__item");
+  const container = getPersonContainer(person);
   container.classList.add("hidden");
   person.classList.add("hidden");
 }
 function displayPerson(person) {
-  const container = person.closest(".artdeco-list__item");
+  const container = getPersonContainer(person);
   container.classList.remove("hidden");
   person.classList.remove("hidden");
 }
@@ -129,6 +138,30 @@ function toggleDisplay(mode) {
       document.querySelector("#display-closed-btn").disabled = false;
       break;
   }
+}
+
+//--------------------------------------------
+// Generate individual hide buttons
+//--------------------------------------------
+waitForKeyElements("#search-results-container", generateHideButtons);
+function generateHideButtons() {
+  const persons = getAllPersons();
+  console.log(persons);
+  persons.forEach((person) => {
+    const container = getPersonContainer(person);
+    const buttonsList = container.querySelector(".list-style-none");
+
+    if (buttonsList.querySelector(".hide-person-btn")) return;
+
+    const hideHTML = `
+      <li>
+        <button class="hide-person-btn">Hide</button>
+      </li>
+    `;
+    buttonsList.insertAdjacentHTML("beforeEnd", hideHTML);
+    buttonsList.querySelector(".hide-person-btn").onclick = () =>
+      hidePerson(person);
+  });
 }
 
 //--------------------------------------------
