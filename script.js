@@ -66,7 +66,7 @@ function getPersonName(person) {
   return person.innerHTML.trim();
 }
 function getPersonFirstName(person) {
-  const names = personName(person).split(" ");
+  const names = getPersonName(person).split(" ");
   return names.filter((name) => name.length > 1)[0];
 }
 function isOpenProfile(person) {
