@@ -11,6 +11,14 @@
 
 // ==/UserScript==
 
+const openProfileSubject = `This is my Subject`;
+const openProfileMessage = (name) => `Hello ${name},
+
+This is my Message`;
+const connectMessage = (name) => `Hello ${name},
+
+This is my Message`;
+
 console.log("[INFO] Script started");
 console.log(window.location.href);
 
@@ -242,16 +250,6 @@ function pressConnectButton(person) {
 }
 
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
-const openProfileSubject = `Senior Javascript Developer, 4+ years of exp., looking for remote work`;
-const openProfileMessage = (name) => `Hello ${name},
-
-I saw that you are an experienced IT recruiter.
-
-I’m a senior Javascript developer with 4+ years of exp, currently in between projects, looking for remote work.
-
-If you know of any open positions, I would appreciate your help!
-
-Best regards`;
 
 async function sendMessages() {
   const persons = getVisiblePersons();
@@ -302,14 +300,6 @@ async function sendMessages() {
     await sleep(500);
   }
 }
-
-const connectMessage = (name) => `Hello ${name},
-
-I saw that you are an experienced IT recruiter. I would appreciate the possibility of networking with you!
-
-Best regards
-
-Andrei Stoica`;
 
 async function sendConnects() {
   const persons = getVisiblePersons();
