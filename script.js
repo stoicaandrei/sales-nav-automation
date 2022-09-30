@@ -47,7 +47,7 @@ var openProfiles = [];
 })(XMLHttpRequest.prototype.open);
 
 //--------------------------------------------
-// Highlight asynchrous on scrool
+// Filter profiles on scroll
 //--------------------------------------------
 var onNewResults = displayAllProfiles;
 waitForKeyElements("#search-results-container", onNewResults);
@@ -115,7 +115,7 @@ function toggleDisplay(mode) {
 }
 
 //--------------------------------------------
-// Buttons
+// Generate UI
 //--------------------------------------------
 waitForKeyElements("#global-typeahead-search-input", createButtons);
 
@@ -128,9 +128,18 @@ function createButtons(jNode) {
   const buttonsContainer = document.createElement("div");
   columnsContainer.appendChild(buttonsContainer);
 
-  const displayButtons =
-    '<button id="display-all-btn" disabled>Display All</button><button id="display-open-btn">Display Open Profile</button><button id="display-closed-btn">Display Closed Profile</button><br><br>';
-  buttonsContainer.insertAdjacentHTML("beforeEnd", displayButtons);
+  const uiHTML = `
+  <button id="display-all-btn" disabled>Display All</button>
+  <button id="display-open-btn">Display Open Profile</button>
+  <button id="display-closed-btn">Display Closed Profile</button>
+  <br><br>
+  <button id="message-all-btn">Message All</button>
+  <span id="message-counter">Messages: 0</span>
+  <br>
+  <button id="connect-all-btn">Connect All</button>
+  <span id="connection-counter">Connections: 0</span>
+  `;
+  buttonsContainer.insertAdjacentHTML("beforeEnd", uiHTML);
 
   document.querySelector("#display-all-btn").onclick = () =>
     toggleDisplay("all");
@@ -138,26 +147,8 @@ function createButtons(jNode) {
     toggleDisplay("open");
   document.querySelector("#display-closed-btn").onclick = () =>
     toggleDisplay("closed");
-
-  const messageButton = document.createElement("button");
-  messageButton.innerHTML = "Message All";
-  messageButton.onclick = sendMessages;
-  buttonsContainer.appendChild(messageButton);
-
-  const messageCounter = document.createElement("span");
-  messageCounter.id = "message-counter";
-  messageCounter.innerHTML = `Messages: ${messagesSent}`;
-  buttonsContainer.appendChild(messageCounter);
-
-  const connectButton = document.createElement("button");
-  connectButton.innerHTML = "Connect All";
-  connectButton.onclick = sendConnects;
-  buttonsContainer.appendChild(connectButton);
-
-  const connetCounter = document.createElement("span");
-  connetCounter.id = "connection-counter";
-  connetCounter.innerHTML = `Connections: ${connectionsSent}`;
-  buttonsContainer.appendChild(connetCounter);
+  document.querySelector("#message-all-btn").onclick = sendMessages;
+  document.querySelector("#connect-all-btn").onclick = sendConnects;
 }
 
 function updateCounters() {
