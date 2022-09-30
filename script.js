@@ -55,18 +55,35 @@ waitForKeyElements("#search-results-container", onNewResults);
 function hidePerson(person) {
   const container = person.closest(".artdeco-list__item");
   container.classList.add("hidden");
+  person.classList.add("hidden");
 }
 function displayPerson(person) {
   const container = person.closest(".artdeco-list__item");
   container.classList.remove("hidden");
+  person.classList.remove("hidden");
+}
+function getPersonName(person) {
+  return person.innerHTML.trim();
+}
+function getPersonFirstName(person) {
+  const names = personName(person).split(" ");
+  return names.filter((name) => name.length > 1)[0];
 }
 function isOpenProfile(person) {
-  const name = person.innerHTML.trim();
+  const name = getPersonName(person);
   return openProfiles.includes(name);
+}
+function getAllPersons() {
+  return document.querySelectorAll('[data-anonymize="person-name"]');
+}
+function getVisiblePersons() {
+  return document.querySelectorAll(
+    '[data-anonymize="person-name"]:not(.hidden)'
+  );
 }
 
 function displayAllProfiles() {
-  const persons = document.querySelectorAll('[data-anonymize="person-name"]');
+  const persons = getAllPersons();
   persons.forEach((person) => {
     displayPerson(person);
   });
@@ -74,7 +91,7 @@ function displayAllProfiles() {
 
 function displayOpenProfiles() {
   displayAllProfiles();
-  const persons = document.querySelectorAll('[data-anonymize="person-name"]');
+  const persons = getAllPersons();
   persons.forEach((person) => {
     if (!isOpenProfile(person)) hidePerson(person);
   });
@@ -82,7 +99,7 @@ function displayOpenProfiles() {
 
 function displayClosedProfiles() {
   displayAllProfiles();
-  const persons = document.querySelectorAll('[data-anonymize="person-name"]');
+  const persons = getAllPersons();
   persons.forEach((person) => {
     if (isOpenProfile(person)) hidePerson(person);
   });
@@ -117,11 +134,11 @@ function toggleDisplay(mode) {
 //--------------------------------------------
 // Generate UI
 //--------------------------------------------
-waitForKeyElements("#global-typeahead-search-input", createButtons);
+waitForKeyElements("#global-typeahead-search-input", createUI);
 
 var messagesSent = 0;
 var connectionsSent = 0;
-function createButtons(jNode) {
+function createUI(jNode) {
   const columnsContainer = document.querySelector(
     ".container-plain-no-border-radius"
   );
@@ -151,12 +168,44 @@ function createButtons(jNode) {
   document.querySelector("#connect-all-btn").onclick = sendConnects;
 }
 
-function updateCounters() {
+function updateMessagesSent(value) {
+  messagesSent = value;
   const messageCounter = document.querySelector("#message-counter");
   messageCounter.innerHTML = `Messages: ${messagesSent}`;
+}
 
+function updateConnectionsSent(value) {
+  connectionsSent = value;
   const connectCounter = document.querySelector("#connection-counter");
   connectCounter.innerHTML = `Connections: ${connectionsSent}`;
+}
+
+function getDropdown(person) {
+  const row = person.closest(".artdeco-list__item");
+  return row.querySelector(".artdeco-dropdown");
+}
+function displayDropdown(person) {
+  const dropdown = getDropdown(person);
+  const dropdownButton = dropdown.querySelector(".artdeco-dropdown__trigger");
+  dropdownButton.click();
+  return true;
+}
+function getDropdownButtons(person) {
+  const dropdown = getDropdown(person);
+  return dropdown.querySelectorAll("li");
+}
+function pressMessageButton(person) {
+  const buttons = getDropdownButtons(person);
+  const messageButton = buttons[2] || buttons[1];
+  messageButton.children[0].click();
+  return true;
+}
+function pressConnectButton(person) {
+  const buttons = getDropdownButtons(person);
+  const connectButton = buttons[0];
+  if (connectButton.innerText !== "Connect") return false;
+  connectButton.children[0].click();
+  return true;
 }
 
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -171,27 +220,14 @@ If you know of any open positions, I would appreciate your help!
 
 Best regards`;
 
-function closeMessageContainer(messageContainer) {
-  const closeMessageContainerButton = messageContainer.querySelector(
-    '[data-control-name="overlay.close_overlay"]'
-  );
-  closeMessageContainerButton.click();
-}
-
 async function sendMessages() {
-  const persons = document.querySelectorAll('[data-anonymize="person-name"]');
+  const persons = getVisiblePersons();
 
   for (const person of persons) {
-    const row = person.closest(".artdeco-list__item");
-    const dropdown = row.querySelector(".artdeco-dropdown");
-
-    const dropdownButton = dropdown.querySelector(".artdeco-dropdown__trigger");
-    dropdownButton.click();
+    displayDropdown(person);
     await sleep(500);
 
-    const actions = dropdown.querySelectorAll("li");
-    const messageAction = actions[2] || actions[1];
-    messageAction.children[0].click();
+    pressMessageButton(person);
     await sleep(500);
 
     const messageContainer = document.querySelector("#message-overlay");
@@ -209,9 +245,9 @@ async function sendMessages() {
       "textarea.compose-form__message-field"
     );
 
-    const name = person.innerHTML.trim().split(" ")[0];
+    const firstName = getPersonFirstName(person);
     subjectInput.value = openProfileSubject;
-    messageInput.value = openProfileMessage(name);
+    messageInput.value = openProfileMessage(firstName);
 
     subjectInput.dispatchEvent(new Event("keyup"));
     messageInput.dispatchEvent(new Event("input"));
@@ -223,11 +259,13 @@ async function sendMessages() {
     );
     sendButton.click();
 
-    messagesSent++;
-    updateCounters();
+    updateMessagesSent(messagesSent + 1);
     await sleep(500);
 
-    closeMessageContainer(messageContainer);
+    const closeMessageContainerButton = messageContainer.querySelector(
+      '[data-control-name="overlay.close_overlay"]'
+    );
+    closeMessageContainerButton.click();
     await sleep(500);
   }
 }
@@ -240,29 +278,14 @@ Best regards
 
 Andrei Stoica`;
 
-function closeInvitationModal(inivitationModal) {
-  const closeModalButton = inivitationModal.querySelector(
-    ".artdeco-modal__dismiss"
-  );
-  closeModalButton.click();
-}
-
 async function sendConnects() {
-  const persons = document.querySelectorAll('[data-anonymize="person-name"]');
+  const persons = getVisiblePersons();
 
   for (const person of persons) {
-    const row = person.closest(".artdeco-list__item");
-    const dropdown = row.querySelector(".artdeco-dropdown");
-
-    const dropdownButton = dropdown.querySelector(".artdeco-dropdown__trigger");
-    dropdownButton.click();
+    displayDropdown(person);
     await sleep(500);
 
-    const actions = dropdown.querySelectorAll("li");
-    const connectAction = actions[0];
-    if (connectAction.innerText !== "Connect") continue;
-
-    connectAction.children[0].click();
+    if (!pressConnectButton(person)) continue;
     await sleep(500);
 
     const invitationModal = document.querySelector(".artdeco-modal");
@@ -271,17 +294,19 @@ async function sendConnects() {
       "textarea#connect-cta-form__invitation"
     );
 
-    const name = person.innerHTML.trim().split(" ")[0];
-    connectInput.value = connectMessage(name);
+    const firstName = getPersonFirstName(person);
+    connectInput.value = connectMessage(firstName);
 
     const sendButton = invitationModal.querySelector(".connect-cta-form__send");
     sendButton.click();
 
-    connectionsSent++;
-    updateCounters();
+    updateConnectionsSent(connectionsSent + 1);
     await sleep(500);
 
-    closeInvitationModal(invitationModal);
+    const closeModalButton = invitationModal.querySelector(
+      ".artdeco-modal__dismiss"
+    );
+    closeModalButton.click();
     await sleep(500);
   }
 }
