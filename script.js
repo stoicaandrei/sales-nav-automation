@@ -147,7 +147,9 @@ function generateHideButtons() {
   console.log(persons);
   persons.forEach((person) => {
     const container = getPersonContainer(person);
-    const buttonsList = container.querySelector(".list-style-none");
+    const buttonsList = container.querySelector(
+      ".list-style-none.inline-flex.align-items-center.white-space-nowrap"
+    );
 
     if (buttonsList.querySelector(".hide-person-btn")) return;
 
@@ -156,7 +158,7 @@ function generateHideButtons() {
         <button class="hide-person-btn">Hide</button>
       </li>
     `;
-    buttonsList.insertAdjacentHTML("beforeEnd", hideHTML);
+    buttonsList.insertAdjacentHTML("afterbegin", hideHTML);
     buttonsList.querySelector(".hide-person-btn").onclick = () =>
       hidePerson(person);
   });
