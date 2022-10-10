@@ -11,14 +11,6 @@
 
 // ==/UserScript==
 
-const openProfileSubject = `This is my Subject`;
-const openProfileMessage = (name) => `Hello ${name},
-
-This is my Message`;
-const connectMessage = (name) => `Hello ${name},
-
-This is my Message`;
-
 console.log("[INFO] Script started");
 console.log(window.location.href);
 
@@ -152,13 +144,14 @@ function toggleDisplay(mode) {
 //--------------------------------------------
 function generateHideButtons() {
   const persons = getAllPersons();
-  console.log(persons);
+
   persons.forEach((person) => {
     const container = getPersonContainer(person);
-    const buttonsList = container.querySelector(
+    const buttonsList = container?.querySelector(
       ".list-style-none.inline-flex.align-items-center.white-space-nowrap"
     );
 
+    if (!buttonsList) return;
     if (buttonsList.querySelector(".hide-person-btn")) return;
 
     const hideHTML = `
@@ -264,8 +257,11 @@ async function sendMessages() {
     const messageContainer = document.querySelector("#message-overlay");
 
     const prevMessages = messageContainer.querySelector("ul.list-style-none");
-    if (prevMessages.children.length > 1) {
-      closeMessageContainer(messageContainer);
+    if (prevMessages?.children.length > 1) {
+      const closeMessageContainerButton = messageContainer.querySelector(
+        '[data-control-name="overlay.close_overlay"]'
+      );
+      closeMessageContainerButton.click();
       continue;
     }
 
