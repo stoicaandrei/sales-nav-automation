@@ -17,6 +17,14 @@ console.log(window.location.href);
 //--------------------------------------------
 // Get JSON data
 //--------------------------------------------
+const openProfileSubject = `Open Profile Subject`;
+const openProfileMessage = (name) => `Hello ${name},
+
+Blah blah blah`;
+const connectMessage = (name) => `Hello ${name},
+
+Blah blah blah`;
+
 var dataJSON;
 var openProfiles = [];
 
@@ -243,10 +251,6 @@ function pressConnectButton(person) {
 }
 
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
-const openProfileSubject = `Open Profile Subject`;
-const openProfileMessage = (name) => `Hello ${name},
-
-Blah blah blah`;
 
 async function sendMessages() {
   const persons = getVisiblePersons();
@@ -300,10 +304,6 @@ async function sendMessages() {
     await sleep(500);
   }
 }
-
-const connectMessage = (name) => `Hello ${name},
-
-Blah blah blah`;
 
 async function sendConnects() {
   const persons = getVisiblePersons();
